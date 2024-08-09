@@ -24,6 +24,7 @@ enum {
 	MPOL_LOCAL,
 	MPOL_PREFERRED_MANY,
 	MPOL_INTERLEAVE_WEIGHT,
+	MPOL_TOP_BUF, // KOOTM
 	MPOL_MAX,	/* always last member of enum */
 };
 

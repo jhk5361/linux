@@ -3604,6 +3604,9 @@ static const char * const policy_modes[] =
 #endif
 	[MPOL_LOCAL]      = "local",
 	[MPOL_PREFERRED_MANY]  = "prefer (many)",
+#ifdef CONFIG_KOOTM
+	[MPOL_TOP_BUF]    = "top buf"
+#endif
 };
 
 

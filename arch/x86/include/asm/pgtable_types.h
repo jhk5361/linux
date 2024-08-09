@@ -293,6 +293,12 @@ typedef struct pgprot { pgprotval_t pgprot; } pgprot_t;
 
 typedef struct { pgdval_t pgd; } pgd_t;
 
+#ifdef CONFIG_KOOTM
+typedef union {
+	struct
+} tracker_t;
+#endif
+
 static inline pgprot_t pgprot_nx(pgprot_t prot)
 {
 	return __pgprot(pgprot_val(prot) | _PAGE_NX);

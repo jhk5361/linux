@@ -111,6 +111,7 @@ int damon_select_ops(struct damon_ctx *ctx, enum damon_ops_id id)
 	mutex_unlock(&damon_ops_lock);
 	return err;
 }
+EXPORT_SYMBOL_GPL(damon_select_ops);
 
 /*
  * Construct a damon_region struct
@@ -379,11 +380,13 @@ struct damon_target *damon_new_target(void)
 
 	return t;
 }
+EXPORT_SYMBOL_GPL(damon_new_target);
 
 void damon_add_target(struct damon_ctx *ctx, struct damon_target *t)
 {
 	list_add_tail(&t->list, &ctx->adaptive_targets);
 }
+EXPORT_SYMBOL_GPL(damon_add_target);
 
 bool damon_targets_empty(struct damon_ctx *ctx)
 {
@@ -440,6 +443,7 @@ struct damon_ctx *damon_new_ctx(void)
 
 	return ctx;
 }
+EXPORT_SYMBOL_GPL(damon_new_ctx);
 
 static void damon_destroy_targets(struct damon_ctx *ctx)
 {
@@ -465,6 +469,7 @@ void damon_destroy_ctx(struct damon_ctx *ctx)
 
 	kfree(ctx);
 }
+EXPORT_SYMBOL_GPL(damon_destroy_ctx);
 
 static unsigned int damon_age_for_new_attrs(unsigned int age,
 		struct damon_attrs *old_attrs, struct damon_attrs *new_attrs)
@@ -559,6 +564,7 @@ int damon_set_attrs(struct damon_ctx *ctx, struct damon_attrs *attrs)
 	ctx->attrs = *attrs;
 	return 0;
 }
+EXPORT_SYMBOL_GPL(damon_set_attrs);
 
 /**
  * damon_set_schemes() - Set data access monitoring based operation schemes.
@@ -683,6 +689,7 @@ int damon_start(struct damon_ctx **ctxs, int nr_ctxs, bool exclusive)
 
 	return err;
 }
+EXPORT_SYMBOL_GPL(damon_start);
 
 /*
  * __damon_stop() - Stops monitoring of a given context.
@@ -727,6 +734,7 @@ int damon_stop(struct damon_ctx **ctxs, int nr_ctxs)
 	}
 	return err;
 }
+EXPORT_SYMBOL_GPL(damon_stop);
 
 /*
  * damon_check_reset_time_interval() - Check if a time interval is elapsed.

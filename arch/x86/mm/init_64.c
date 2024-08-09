@@ -1634,3 +1634,17 @@ void __meminit vmemmap_populate_print_last(void)
 	}
 }
 #endif
+
+#ifdef CONFIG_KOOTM
+struct keme_cache *tracker_cache;
+
+static int __init tracker_cache_init(void)
+{
+	tracker_cache = kmem_cache_create("kootm_tracker",
+						sizeof(tracker_t) * 512,
+						sizeof(tracker_t) * 512,
+						SLAB_PANIC,
+						NULL);
+	return 0;
+}
+#endif

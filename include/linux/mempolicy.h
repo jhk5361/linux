@@ -51,6 +51,9 @@ struct mempolicy {
 	struct list_head weight_list;
 	unsigned int weight_repeat;
 #endif
+#ifdef CONFIG_KOOTM
+	struct list_head tb_list; 
+#endif
 	union {
 		nodemask_t cpuset_mems_allowed;	/* relative to these nodes */
 		nodemask_t user_nodemask;	/* nodemask passed by user */

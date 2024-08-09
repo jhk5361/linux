@@ -28,6 +28,16 @@ void paravirt_tlb_remove_table(struct mmu_gather *tlb, void *table)
 
 gfp_t __userpte_alloc_gfp = GFP_PGTABLE_USER | PGTABLE_HIGHMEM;
 
+#ifdef CONFIG_KOOTM
+static void __pte_alloc_tracker(struct page *page)
+{
+	page->tracker = kmem_cache_alloc(tracker_cache, __userptr_alloc_gfp);
+	if (page->tracker)
+		SetPageKootm(page);
+
+}
+#endif
+
 pgtable_t pte_alloc_one(struct mm_struct *mm)
 {
 	return __pte_alloc_one(mm, __userpte_alloc_gfp);
@@ -562,6 +572,7 @@ int ptep_test_and_clear_young(struct vm_area_struct *vma,
 
 	return ret;
 }
+EXPORT_SYMBOL(ptep_test_and_clear_young);
 
 #if defined(CONFIG_TRANSPARENT_HUGEPAGE) || defined(CONFIG_ARCH_HAS_NONLEAF_PMD_YOUNG)
 int pmdp_test_and_clear_young(struct vm_area_struct *vma,
@@ -575,6 +586,7 @@ int pmdp_test_and_clear_young(struct vm_area_struct *vma,
 
 	return ret;
 }
+EXPORT_SYMBOL(pmdp_test_and_clear_young);
 #endif
 
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
