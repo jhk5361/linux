@@ -47,12 +47,10 @@ struct mempolicy {
 	unsigned short flags;	/* See set_mempolicy() MPOL_F_* above */
 	nodemask_t nodes;	/* interleave/bind/perfer */
 	int home_node;		/* Home node to use for MPOL_BIND and MPOL_PREFERRED_MANY */
+						/* and MPOL_TOP_DOWN */
 #ifdef CONFIG_INTERLEAVE_WEIGHT
 	struct list_head weight_list;
 	unsigned int weight_repeat;
-#endif
-#ifdef CONFIG_KOOTM
-	struct list_head tb_list; 
 #endif
 	union {
 		nodemask_t cpuset_mems_allowed;	/* relative to these nodes */

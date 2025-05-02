@@ -2814,6 +2814,7 @@ void do_set_cpus_allowed(struct task_struct *p, const struct cpumask *new_mask)
 	 */
 	kfree_rcu((union cpumask_rcuhead *)ac.user_mask, rcu);
 }
+EXPORT_SYMBOL_GPL(do_set_cpus_allowed);
 
 static cpumask_t *alloc_user_cpus_ptr(int node)
 {

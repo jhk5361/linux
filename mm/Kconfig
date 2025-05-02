@@ -1267,6 +1267,14 @@ config INTERLEAVE_WEIGHT
 	  memory utilization by determining the page allocation ratio based on
 	  bandwidth differences between NUMA memories.
 
+config TOP_DOWN
+	bool "Enable top down policy"
+	depends on NUMA && X86 && 64BIT
+	default n
+	help
+	  top-down allocation
+
+
 source "mm/damon/Kconfig"
 
 endmenu

@@ -1409,6 +1409,22 @@ const char * const vmstat_text[] = {
 	"vma_lock_retry",
 	"vma_lock_miss",
 #endif
+	"migrate_0_0",
+	"migrate_0_1",
+	"migrate_0_2",
+	"migrate_0_3",
+	"migrate_1_0",
+	"migrate_1_1",
+	"migrate_1_2",
+	"migrate_1_3",
+	"migrate_2_0",
+	"migrate_2_1",
+	"migrate_2_2",
+	"migrate_2_3",
+	"migrate_3_0",
+	"migrate_3_1",
+	"migrate_3_2",
+	"migrate_3_3",
 #endif /* CONFIG_VM_EVENT_COUNTERS || CONFIG_MEMCG */
 };
 #endif /* CONFIG_PROC_FS || CONFIG_SYSFS || CONFIG_NUMA || CONFIG_MEMCG */

@@ -1706,6 +1706,7 @@ extern void perf_event_disable_inatomic(struct perf_event *event);
 extern void perf_event_task_tick(void);
 extern int perf_event_account_interrupt(struct perf_event *event);
 extern int perf_event_period(struct perf_event *event, u64 value);
+extern u64 perf_event_get_period(struct perf_event *event);
 extern u64 perf_event_pause(struct perf_event *event, bool reset);
 #else /* !CONFIG_PERF_EVENTS: */
 static inline void *
@@ -1786,6 +1787,10 @@ static inline int __perf_event_disable(void *info)			{ return -1; }
 static inline void perf_event_task_tick(void)				{ }
 static inline int perf_event_release_kernel(struct perf_event *event)	{ return 0; }
 static inline int perf_event_period(struct perf_event *event, u64 value)
+{
+	return -EINVAL;
+}
+static inline u64 perf_event_get_period(struct perf_event *event)
 {
 	return -EINVAL;
 }
@@ -1905,5 +1910,9 @@ static inline void perf_lopwr_cb(bool mode)
 {
 }
 #endif
+
+extern int kmig__perf_event_init(struct perf_event *event, unsigned long nr_pages);
+extern int kmig__perf_event_open(struct perf_event_attr *attr_ptr, pid_t pid,
+	int cpu, int group_fd, unsigned long flags);
 
 #endif /* _LINUX_PERF_EVENT_H */

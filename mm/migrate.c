@@ -993,6 +993,7 @@ static int move_to_new_folio(struct folio *dst, struct folio *src,
 	 * src is freed; but stats require that PageAnon be left as PageAnon.
 	 */
 	if (rc == MIGRATEPAGE_SUCCESS) {
+		count_vm_events(VM_MIGRATE_BASE + folio_nid(src) * KMIG_MAX_NUMA_NODES + folio_nid(dst), folio_nr_pages(src));
 		if (__PageMovable(&src->page)) {
 			VM_BUG_ON_FOLIO(!folio_test_isolated(src), src);
 
@@ -1447,10 +1448,12 @@ put_anon:
 out_unlock:
 	folio_unlock(src);
 out:
-	if (rc == MIGRATEPAGE_SUCCESS)
+	if (rc == MIGRATEPAGE_SUCCESS) {
+		//count_vm_events(VM_MIGRATE_BASE + folio_nid(src) * KMIG_MAX_NUMA_NODES + folio_nid(dst), folio_nr_pages(src));
 		folio_putback_active_hugetlb(src);
-	else if (rc != -EAGAIN)
+	} else if (rc != -EAGAIN) {
 		list_move_tail(&src->lru, ret);
+	}
 
 	/*
 	 * If migration was not successful and there's a freeing callback, use
@@ -1488,6 +1491,10 @@ static inline int try_split_folio(struct folio *folio, struct list_head *split_f
 #define NR_MAX_MIGRATE_SYNC_RETRY					\
 	(NR_MAX_MIGRATE_PAGES_RETRY - NR_MAX_MIGRATE_ASYNC_RETRY)
 
+//#ifdef CONFIG_KOOTM
+//#define NR_MAX_NODE_KOO 4
+//#endif
+
 struct migrate_pages_stats {
 	int nr_succeeded;	/* Normal and large folios migrated successfully, in
 				   units of base pages */
@@ -1496,6 +1503,9 @@ struct migrate_pages_stats {
 	int nr_thp_succeeded;	/* THP migrated successfully */
 	int nr_thp_failed;	/* THP failed to be migrated */
 	int nr_thp_split;	/* THP split before migrating */
+//#ifdef CONFIG_KOOTM
+//	int nr_succeeded_per_path[NR_MAX_NODE_KOO][NR_MAX_NODE_KOO];
+//#endif
 };
 
 /*
@@ -1517,6 +1527,8 @@ static int migrate_hugetlbs(struct list_head *from, new_folio_t get_new_folio,
 	int pass = 0;
 	struct folio *folio, *folio2;
 	int rc, nr_pages;
+	//int nr_succeeded_per_path[KMIG_MAX_NUMA_NODES][KMIG_MAX_NUMA_NODES] = {0,};
+	//int i, j;
 
 	for (pass = 0; pass < NR_MAX_MIGRATE_PAGES_RETRY && retry; pass++) {
 		retry = 0;
@@ -1620,6 +1632,8 @@ static int migrate_pages_batch(struct list_head *from,
 	LIST_HEAD(unmap_folios);
 	LIST_HEAD(dst_folios);
 	bool nosplit = (reason == MR_NUMA_MISPLACED);
+	//int nr_succeeded_per_path[KMIG_MAX_NUMA_NODES][KMIG_MAX_NUMA_NODES] = {0,};
+	//int i, j;
 
 	VM_WARN_ON_ONCE(mode != MIGRATE_ASYNC &&
 			!list_empty(from) && !list_is_singular(from));
@@ -1774,6 +1788,7 @@ move:
 			case MIGRATEPAGE_SUCCESS:
 				stats->nr_succeeded += nr_pages;
 				stats->nr_thp_succeeded += is_thp;
+				//nr_succeeded_per_path[folio_nid(folio)][folio_nid(dst)] += nr_pages;
 				break;
 			default:
 				nr_failed++;
@@ -1807,6 +1822,14 @@ out:
 		dst2 = list_next_entry(dst, lru);
 	}
 
+	/*
+	for (i = 0; i < KMIG_MAX_NUMA_NODES; i++) {
+		for (j = 0; j < KMIG_MAX_NUMA_NODES; j++) {
+			count_vm_events(VM_MIGRATE_BASE + i * KMIG_MAX_NUMA_NODES + j, nr_succeeded_per_path[i][j]);
+		}
+	}
+	*/
+
 	return rc;
 }
 
@@ -1817,6 +1840,7 @@ static int migrate_pages_sync(struct list_head *from, new_folio_t get_new_folio,
 		struct migrate_pages_stats *stats)
 {
 	int rc, nr_failed = 0;
+	//int i, j;
 	LIST_HEAD(folios);
 	struct migrate_pages_stats astats;
 
@@ -1828,6 +1852,13 @@ static int migrate_pages_sync(struct list_head *from, new_folio_t get_new_folio,
 	stats->nr_succeeded += astats.nr_succeeded;
 	stats->nr_thp_succeeded += astats.nr_thp_succeeded;
 	stats->nr_thp_split += astats.nr_thp_split;
+	/*
+	for (i = 0; i < NR_MAX_NODE_KOO; i++) {
+		for (j = 0; j < NR_MAX_NODE_KOO; j++) {
+			stats->nr_succeeded_per_path[i][j] += astats.nr_succeeded_per_path[i][j];
+		}
+	}
+	*/
 	if (rc < 0) {
 		stats->nr_failed_pages += astats.nr_failed_pages;
 		stats->nr_thp_failed += astats.nr_thp_failed;
